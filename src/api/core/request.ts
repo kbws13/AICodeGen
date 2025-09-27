@@ -37,17 +37,18 @@ instance.interceptors.response.use(
       return responseData
     }
     // 正常请求
+    console.log("responseData: ", responseData)
     if (responseData.code == 0) {
       return responseData.data
     } else if (responseData.code == 40000) {
       message.error(responseData.message)
     } else if (responseData.code == 40100) {
-      if (
-        !responseData.request.responseURL.include('user/get/login') &&
-        !window.location.pathname.includes('user/login')
-      ) {
+      if (!window.location.pathname.includes('user/login')) {
         message.warning('请先登录')
         window.location.href = `/user/login?redirect=${window.location.href}`
+      }
+      return {
+        name: '未登录',
       }
     }
     return Promise.reject({ showError: false })
@@ -56,3 +57,40 @@ instance.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+const request = <T>(config: Api): Promise<T> => {
+  let contentType = contentTypeForm
+  const formData = new FormData() // 创建form对象
+  for (const key in config.body) {
+    formData.append(key, config.body[key] == undefined ? '' : config.body[key])
+  }
+  if (config.dataType != null && config.dataType == 'json') {
+    contentType = contentTypeJson
+  }
+  // 如果是 GET 请求，将参数拼接到 URL 上
+  if (config.method === 'GET' && config.body) {
+    const queryString = new URLSearchParams(config.body).toString()
+    config.url = `${config.url}?${queryString}`
+  }
+  // const token = VueCookies.get('token')
+
+  const headers = {
+    'Content-Type': contentType,
+    'X-Requested-With': 'XMLHttpRequest',
+    // "token": token
+  }
+  return instance.request({
+    headers: headers,
+    url: config.url,
+    method: config.method,
+    data: config.method === 'GET' ? undefined : config.dataType == 'json' ? config.body : formData,
+    // withCredentials: true,
+    onUploadProgress: (event) => {
+      if (config.uploadProgressCallback) {
+        config.uploadProgressCallback(event)
+      }
+    },
+  })
+}
+
+export default request

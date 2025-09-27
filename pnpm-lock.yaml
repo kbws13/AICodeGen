@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@ant-design/icons-vue':
+        specifier: ^7.0.1
+        version: 7.0.1(vue@3.5.22(typescript@5.8.3))
       axios:
         specifier: ^1.12.2
         version: 1.12.2
+      dayjs:
+        specifier: ^1.11.18
+        version: 1.11.18
       pinia:
         specifier: ^3.0.3
         version: 3.0.3(typescript@5.8.3)(vue@3.5.22(typescript@5.8.3))
