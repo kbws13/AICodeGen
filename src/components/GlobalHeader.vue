@@ -74,6 +74,11 @@ const originItems = [
     title: '用户管理',
   },
   {
+    key: '/admin/appManage',
+    label: '应用管理',
+    title: '应用管理',
+  },
+  {
     key: 'author',
     label: h('a', { href: 'https://github.com/kbws13' }, '空白无上'),
     title: '空白无上',

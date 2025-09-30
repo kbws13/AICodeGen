@@ -29,3 +29,8 @@ export const App = {
 export const Static = {
   serveStaticResource: '/static'
 }
+
+export const History = {
+  listAppChatHistory: '/chatHistory/app',
+  listAllChatHistoryByPageForAdmin: '/chatHistory/admin/list/page/vo'
+}
