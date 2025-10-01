@@ -3,6 +3,9 @@
     <div class="header-bar">
       <div class="header-left">
         <h1 class="app-name">{{ appInfo?.appName || '网站生成器' }}</h1>
+        <a-tag v-if="appInfo?.codeGenType" color="blue" class="code-gen-type-tag">
+          {{ formatCodeGenType(appInfo.codeGenType) }}
+        </a-tag>
       </div>
       <div class="header-right">
         <a-button type="default" @click="showAppDetail">
@@ -10,6 +13,18 @@
             <InfoCircleOutlined />
           </template>
           应用详情
+        </a-button>
+        <a-button
+          type="primary"
+          ghost
+          @click="download"
+          :loading="downloading"
+          :disabled="!isOwner"
+        >
+          <template #icon>
+            <DownloadOutlined />
+          </template>
+          下载代码
         </a-button>
         <a-button type="primary" @click="deployApp" :loading="deploying">
           <template #icon>
@@ -151,9 +166,10 @@ import type { AppVO } from '@/api/models/response/app/AppVO.ts'
 import { message } from 'ant-design-vue'
 import { AppService } from '@/api/services/AppService.ts'
 import { API_BASE_URL, getStaticPreviewUrl } from '@/config/env.ts'
-import { CodeGenTypeEnum } from '@/utils/codeGenTypes.ts'
+import { CodeGenTypeEnum, formatCodeGenType } from '@/utils/codeGenTypes.ts'
 import {
   CloudUploadOutlined,
+  DownloadOutlined,
   ExportOutlined,
   InfoCircleOutlined,
   SendOutlined,
@@ -161,7 +177,7 @@ import {
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import DeploySuccessModal from '@/components/DeploySuccessModal.vue'
 import AppDetailModal from '@/components/AppDetailModal.vue'
-import aiAvatar from '@/assets/aiAvatar.png'
+import aiAvatar from '@/assets/aiAvatar.svg'
 import type { ListAppChatHistoryParam } from '@/api/models/request/chatHistory/ListAppChatHistoryParam.ts'
 import { ChatHistoryService } from '@/api/services/ChatHistoryService.ts'
 
@@ -201,6 +217,9 @@ const previewReady = ref(false)
 const deploying = ref(false)
 const deployModalVisible = ref(false)
 const deployUrl = ref('')
+
+// 下载相关
+const downloading = ref(false)
 
 //权限相关
 const isOwner = computed(() => {
@@ -246,7 +265,7 @@ const fetchAppInfo = async () => {
         messages.value.length === 0 &&
         historyLoaded.value
       ) {
-        console.log("发送初始提示词")
+        console.log('发送初始提示词')
         hasInitialConversation.value = true
         await sendInitialMessage(appInfo.value.initPrompt)
       }
@@ -519,6 +538,42 @@ const deployApp = async () => {
     message.error('部署失败，请重试')
   } finally {
     deploying.value = false
+  }
+}
+
+const download = async () => {
+  if (!appId.value) {
+    message.error('应用 ID 不存在')
+    return
+  }
+  downloading.value = true
+  try {
+    const url = `${API_BASE_URL}/app/download/${appId.value}`
+    const response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+    })
+    if (!response.ok) {
+      throw new Error(`下载失败: ${response.status}`)
+    }
+    // 获取文件名
+    const contentDisposition = response.headers.get('Content-Disposition')
+    const fileName = contentDisposition?.match(/filename="(.+)"/)?.[1] || `app-${appId.value}.zip`
+    // 下载文件
+    const blob = await response.blob()
+    const downloadUrl = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = downloadUrl
+    link.download = fileName
+    link.click()
+    // 清理
+    URL.revokeObjectURL(downloadUrl)
+    message.success('代码下载成功')
+  } catch (error) {
+    console.error('下载失败：', error)
+    message.error('下载失败，请重试')
+  } finally {
+    downloading.value = false
   }
 }
 

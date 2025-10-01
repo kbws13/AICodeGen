@@ -24,13 +24,14 @@ export const App = {
   listAppVOByPageByAdmin: '/app/admin/list/page/vo',
   getAppVOByIdByAdmin: '/app/admin/get/vo',
   deployApp: '/app/deploy',
+  download: '/app/download',
 }
 
 export const Static = {
-  serveStaticResource: '/static'
+  serveStaticResource: '/static',
 }
 
 export const History = {
   listAppChatHistory: '/chatHistory/app',
-  listAllChatHistoryByPageForAdmin: '/chatHistory/admin/list/page/vo'
+  listAllChatHistoryByPageForAdmin: '/chatHistory/admin/list/page/vo',
 }

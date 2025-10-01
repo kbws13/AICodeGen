@@ -112,4 +112,13 @@ export class AppService {
       dataType: 'json',
     })
   }
+
+  public static async download(id: number): Promise<any> {
+    return await request<any>({
+      url: `${App.download}/${id}`,
+      method: 'GET',
+      body: null,
+      dataType: 'url'
+    })
+  }
 }
