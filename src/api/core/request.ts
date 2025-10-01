@@ -51,7 +51,7 @@ instance.interceptors.response.use(
         name: '未登录',
       }
     }
-    return Promise.reject({ showError: false })
+    return Promise.reject(responseData)
   },
   function (error) {
     return Promise.reject(error)

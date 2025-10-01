@@ -15,7 +15,7 @@
           <template #icon>
             <CloudUploadOutlined />
           </template>
-          部署按钮
+          部署
         </a-button>
       </div>
     </div>
@@ -246,6 +246,7 @@ const fetchAppInfo = async () => {
         messages.value.length === 0 &&
         historyLoaded.value
       ) {
+        console.log("发送初始提示词")
         hasInitialConversation.value = true
         await sendInitialMessage(appInfo.value.initPrompt)
       }
@@ -351,7 +352,7 @@ const loadChatHistory = async (isLoadMore = false) => {
       } else {
         hasMoreHistory.value = false
       }
-      historyLoaded.value = false
+      historyLoaded.value = true
     }
   } catch (error) {
     console.log('加载对话历史失败, ', error)

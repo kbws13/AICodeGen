@@ -9,12 +9,13 @@ export class ChatHistoryService {
   public static async listAppChatHistory(
     listAppChatHistoryParam: ListAppChatHistoryParam,
   ): Promise<Page<ChatHistory>> {
+    const { appId, pageSize, lastCreateTime } = listAppChatHistoryParam
     return request<Page<ChatHistory>>({
-      url: `${History.listAppChatHistory}/${listAppChatHistoryParam.appId}`,
+      url: `${History.listAppChatHistory}/${appId}`,
       method: 'GET',
       body: {
-        pageSize: listAppChatHistoryParam.pageSize,
-        lastCreateTime: listAppChatHistoryParam.lastCreateTime,
+        pageSize: pageSize,
+        ...(lastCreateTime != null ? { lastCreateTime } : {}),
       },
       dataType: 'url',
     })
